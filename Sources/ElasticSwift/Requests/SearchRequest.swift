@@ -16,7 +16,7 @@ import NIOHTTP1
 
 public class SearchRequestBuilder: RequestBuilder {
     public typealias RequestType = SearchRequest
-
+    
     private var _indices: [String]?
     private var _types: [String]?
     private var _searchSource = SearchSource()
@@ -24,9 +24,11 @@ public class SearchRequestBuilder: RequestBuilder {
     private var _scroll: Scroll?
     private var _searchType: SearchType?
     private var _preference: String?
+    private var _urlParams: [URLQueryItem]?
+    private var _httpMethod: HTTPMethod = .POST
 
     public init() {}
-
+    
     @discardableResult
     public func set(indices: String...) -> Self {
         _indices = indices
@@ -170,6 +172,18 @@ public class SearchRequestBuilder: RequestBuilder {
         _searchSource.searchAfter = searchAfter
         return self
     }
+    
+    @discardableResult
+    public func set(urlParams: [URLQueryItem]) -> Self {
+        _urlParams = urlParams
+        return self
+    }
+    
+    @discardableResult
+    public func set(httpMethod: HTTPMethod) -> Self {
+        _httpMethod = httpMethod
+        return self
+    }
 
     @discardableResult
     public func add(sort: Sort) -> Self {
@@ -286,6 +300,14 @@ public class SearchRequestBuilder: RequestBuilder {
     public var preference: String? {
         return _preference
     }
+    
+    public var urlParams: [URLQueryItem]? {
+        return _urlParams
+    }
+    
+    public var httpMethod: HTTPMethod {
+        return _httpMethod
+    }
 
     public func build() throws -> SearchRequest {
         return try SearchRequest(withBuilder: self)
@@ -304,17 +326,21 @@ public struct SearchRequest: Request {
     public var scroll: Scroll?
     public var searchType: SearchType?
     public var preference: String?
+    public var urlParams: [URLQueryItem]?
+    public var httpMethod: HTTPMethod?
 
-    public init(indices: [String]?, types: [String]?, searchSource: SearchSource?, scroll: Scroll? = nil, searchType: SearchType? = nil, preference: String? = nil) {
+    public init(indices: [String]?, types: [String]?, searchSource: SearchSource?, scroll: Scroll? = nil, searchType: SearchType? = nil, preference: String? = nil, urlParams: [URLQueryItem]? = nil, httpMethod: HTTPMethod?) {
         self.indices = indices
         self.types = types
         self.searchSource = searchSource
         self.scroll = scroll
         self.searchType = searchType
         self.preference = preference
+        self.urlParams = urlParams
+        self.httpMethod = httpMethod
     }
 
-    public init(indices: [String]? = nil, types: [String]? = nil, query: Query? = nil, from: Int16? = nil, size: Int16? = nil, sorts: [Sort]? = nil, sourceFilter: SourceFilter? = nil, explain: Bool? = nil, minScore: Decimal? = nil, scroll: Scroll? = nil, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, searchType: SearchType? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool? = nil, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]? = nil, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil, searchAfter: CodableValue? = nil) {
+    public init(indices: [String]? = nil, types: [String]? = nil, query: Query? = nil, from: Int16? = nil, size: Int16? = nil, sorts: [Sort]? = nil, sourceFilter: SourceFilter? = nil, explain: Bool? = nil, minScore: Decimal? = nil, scroll: Scroll? = nil, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, searchType: SearchType? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool? = nil, preference: String? = nil, urlParams: [URLQueryItem]?, httpMethod: HTTPMethod?, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]? = nil, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil, searchAfter: CodableValue? = nil) {
         var searchSource = SearchSource()
         searchSource.query = query
         searchSource.postFilter = postFilter
@@ -334,19 +360,19 @@ public struct SearchRequest: Request {
         searchSource.scriptFields = scriptFields
         searchSource.storedFields = storedFields
         searchSource.version = version
-        self.init(indices: indices, types: types, searchSource: searchSource, scroll: scroll, searchType: searchType, preference: preference)
+        self.init(indices: indices, types: types, searchSource: searchSource, scroll: scroll, searchType: searchType, preference: preference, urlParams: urlParams, httpMethod: httpMethod)
     }
 
-    public init(indices: String..., types: [String]? = nil, query: Query? = nil, from: Int16? = nil, size: Int16? = nil, sorts: [Sort]? = nil, sourceFilter: SourceFilter? = nil, explain: Bool? = nil, minScore: Decimal? = nil, scroll: Scroll? = nil, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, searchType: SearchType? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool? = nil, preference: String? = nil, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]? = nil, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil, searchAfter: CodableValue? = nil) {
-        self.init(indices: indices, types: types, query: query, from: from, size: size, sorts: sorts, sourceFilter: sourceFilter, explain: explain, minScore: minScore, scroll: scroll, trackScores: trackScores, indicesBoost: indicesBoost, searchType: searchType, seqNoPrimaryTerm: seqNoPrimaryTerm, version: version, preference: preference, scriptFields: scriptFields, storedFields: storedFields, docvalueFields: docvalueFields, postFilter: postFilter, highlight: highlight, rescore: rescore, searchAfter: searchAfter)
+    public init(indices: String..., types: [String]? = nil, query: Query? = nil, from: Int16? = nil, size: Int16? = nil, sorts: [Sort]? = nil, sourceFilter: SourceFilter? = nil, explain: Bool? = nil, minScore: Decimal? = nil, scroll: Scroll? = nil, trackScores: Bool? = nil, indicesBoost: [IndexBoost]? = nil, searchType: SearchType? = nil, seqNoPrimaryTerm: Bool? = nil, version: Bool? = nil, preference: String? = nil, urlParams: [URLQueryItem]? = nil, httpMethod: HTTPMethod, scriptFields: [ScriptField]? = nil, storedFields: [String]? = nil, docvalueFields: [DocValueField]? = nil, postFilter: Query? = nil, highlight: Highlight? = nil, rescore: [QueryRescorer]? = nil, searchAfter: CodableValue? = nil) {
+        self.init(indices: indices, types: types, query: query, from: from, size: size, sorts: sorts, sourceFilter: sourceFilter, explain: explain, minScore: minScore, scroll: scroll, trackScores: trackScores, indicesBoost: indicesBoost, searchType: searchType, seqNoPrimaryTerm: seqNoPrimaryTerm, version: version, preference: preference, urlParams: urlParams, httpMethod: httpMethod, scriptFields: scriptFields, storedFields: storedFields, docvalueFields: docvalueFields, postFilter: postFilter, highlight: highlight, rescore: rescore, searchAfter: searchAfter)
     }
 
     internal init(withBuilder builder: SearchRequestBuilder) throws {
-        self.init(indices: builder.indices, types: builder.types, searchSource: builder.searchSource, scroll: builder.scroll, searchType: builder.searchType, preference: builder.preference)
+        self.init(indices: builder.indices, types: builder.types, searchSource: builder.searchSource, scroll: builder.scroll, searchType: builder.searchType, preference: builder.preference, urlParams: builder.urlParams, httpMethod: builder.httpMethod)
     }
 
     public var method: HTTPMethod {
-        return .POST
+        return httpMethod ?? .POST
     }
 
     public var endPoint: String {
@@ -371,6 +397,11 @@ public struct SearchRequest: Request {
         if let preference = self.preference {
             queryItems.append(URLQueryItem(name: QueryParams.preference, value: preference))
         }
+        
+        if let urlParams = self.urlParams {
+            queryItems.append(contentsOf: urlParams)
+        }
+        
         return queryItems
     }
 
@@ -1013,7 +1044,7 @@ extension SearchSource: Equatable {
 
 public class SearchTemplateRequestBuilder: RequestBuilder {
     public typealias RequestType = SearchTemplateRequest
-
+    
     private var _scriptType: ScriptType?
     private var _script: String?
     private var _params: [String: CodableValue]?

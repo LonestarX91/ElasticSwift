@@ -492,7 +492,11 @@ public extension ElasticClient {
         let bodyResult = request.makeBody(serializer)
         switch bodyResult {
         case let .success(data):
-            return .success(HTTPRequest(path: request.endPoint, method: request.method, queryParams: params, headers: headers, body: data))
+            if request.method == .GET {
+                return .success(HTTPRequest(path: request.endPoint, method: request.method, queryParams: params, headers: headers, body: nil))
+            } else {
+                return .success(HTTPRequest(path: request.endPoint, method: request.method, queryParams: params, headers: headers, body: data))
+            }
         case let .failure(error):
             switch error {
             case .noBodyForRequest:
