@@ -97,7 +97,7 @@ public extension ElasticClient {
     ///   - serachRequest: the request
     ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    func search<T: Codable>(_ serachRequest: SearchRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
+    func search<T: Codable, Q: Codable>(_ serachRequest: SearchRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<SearchResponse<T, Q>, Error>) -> Void) -> Void {
         return execute(request: serachRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -108,7 +108,7 @@ public extension ElasticClient {
     ///   - serachRequest: the request
     ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    func scroll<T: Codable>(_ scrollRequest: SearchScrollRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) -> Void {
+    func scroll<T: Codable, Q: Codable>(_ scrollRequest: SearchScrollRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<SearchResponse<T, Q>, Error>) -> Void) -> Void {
         return execute(request: scrollRequest, options: options, completionHandler: completionHandler)
     }
 
@@ -284,7 +284,7 @@ public extension ElasticClient {
     ///   - searchTemplateRequest: the request.
     ///   - options: the request options (e.g. headers), defaults to `RequestOptions.default` if nothing to be customized.
     ///   - completionHandler: callback to be invoked upon request completion.
-    func searchTemplate<T: Codable>(_ searchTemplateRequest: SearchTemplateRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<SearchResponse<T>, Error>) -> Void) {
+    func searchTemplate<T: Codable, Q: Codable>(_ searchTemplateRequest: SearchTemplateRequest, with options: RequestOptions = .default, completionHandler: @escaping (_ result: Result<SearchResponse<T, Q>, Error>) -> Void) {
         return execute(request: searchTemplateRequest, options: options, completionHandler: completionHandler)
     }
 }

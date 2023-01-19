@@ -61,11 +61,11 @@ public struct IndexResponse: Codable, Equatable {
 
 // MARK: - Search Response
 
-public struct SearchResponse<T: Codable>: Codable, Equatable where T: Equatable {
+public struct SearchResponse<T: Codable, Q: Codable>: Codable, Equatable where T: Equatable, Q: Equatable {
     public let took: Int
     public let timedOut: Bool
     public let shards: Shards
-    public let hits: SearchHits<T>
+    public let hits: SearchHits<T, Q>
     public let scrollId: String?
     public let profile: SearchProfileShardResults?
     public let suggest: [String: [SuggestEntry]]?
@@ -188,12 +188,12 @@ extension CollectorResult: Codable {
 
 extension CollectorResult: Equatable {}
 
-public struct SearchHits<T: Codable>: Codable, Equatable where T: Equatable {
-    public let total: Int
+public struct SearchHits<T: Codable, Q: Codable>: Codable, Equatable where T: Equatable, Q: Equatable {
+    public let total: Q
     public let maxScore: Decimal?
     public let hits: [SearchHit<T>]
 
-    public init(total: Int, maxScore: Decimal?, hits: [SearchHit<T>] = []) {
+    public init(total: Q, maxScore: Decimal?, hits: [SearchHit<T>] = []) {
         self.total = total
         self.maxScore = maxScore
         self.hits = hits
@@ -219,7 +219,7 @@ public struct SearchHit<T: Codable> where T: Equatable {
     public let fields: [String: SearchHitField]?
     public let explanation: Explanation?
     public let matchedQueries: [String]?
-    public let innerHits: [String: SearchHits<CodableValue>]?
+    public let innerHits: [String: SearchHits<CodableValue, CodableValue>]?
     public let node: String?
     public let shard: String?
     public let highlightFields: [String: HighlightField]?
@@ -323,7 +323,7 @@ extension SearchHit: Codable {
     }
 
     private struct InnerHitWrapper: Codable, Equatable {
-        public let hits: SearchHits<CodableValue>
+        public let hits: SearchHits<CodableValue, CodableValue>
     }
 }
 
